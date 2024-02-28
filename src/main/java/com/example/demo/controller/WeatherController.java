@@ -3,10 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.service.WeatherService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
@@ -18,8 +15,8 @@ public class WeatherController {
         this.weatherService = weatherService;
     }
 
-    @PostMapping("/create/weather")
-    void createWeather(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestBody String text){
-        weatherService.createWeather(date, text);
+    @GetMapping("/create/weather")
+    void createWeather(@RequestParam Float latitude, @RequestParam Float longtitude){
+        weatherService.createWeather(latitude, longtitude);
     }
 }
