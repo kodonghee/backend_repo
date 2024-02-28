@@ -5,6 +5,7 @@ import com.example.demo.service.impl.WeatherServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 @RestController
@@ -16,7 +17,7 @@ public class WeatherController {
     }
 
     @GetMapping("/create/weather")
-    Map<String, Object> createWeather(@RequestParam Float latitude, @RequestParam Float longtitude){
+    ArrayList<Map<String, Object>> createWeather(@RequestParam Float latitude, @RequestParam Float longtitude){
         return weatherService.createWeather(latitude, longtitude);
     }
 }

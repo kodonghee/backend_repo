@@ -6,6 +6,7 @@ import com.example.demo.service.impl.WeatherServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 @RestController
@@ -17,7 +18,8 @@ public class MountainController {
     }
 
     @GetMapping("/create/mountain")
-    String createMountain(){
+    ArrayList<Map<String, Object>> createMountain(){
+        System.out.println("create/mountain");
         return mountainService.createMountain();
     }
 }

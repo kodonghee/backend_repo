@@ -12,7 +12,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -21,12 +23,12 @@ public class WeatherServiceImpl implements WeatherService {
     @Value("${openweathermap.key}")
     private String apiKey;
     @Override
-    public Map<String, Object> createWeather(Float latitude, Float longtitude){
+    public ArrayList<Map<String, Object>> createWeather(Float latitude, Float longtitude){
         // weather map에서 날씨 데이터 가져옴
         String weatherData = getWeatherString(latitude, longtitude);
 
         // 날씨 json 파싱
-        Map<String, Object> parseWeather = parseWeather(weatherData);
+        ArrayList<Map<String, Object>> parseWeather = parseWeather(weatherData);
         System.out.println(parseWeather);
 
         // 파싱 데이터 db 저장
@@ -60,7 +62,7 @@ public class WeatherServiceImpl implements WeatherService {
         }
     }
 
-    private Map<String, Object> parseWeather(String jsonString){
+    private ArrayList<Map<String, Object>> parseWeather(String jsonString){
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject;
 
@@ -70,15 +72,19 @@ public class WeatherServiceImpl implements WeatherService {
             throw new RuntimeException(e);
         }
 
-        Map<String, Object> resultMap = new HashMap<>();
+        ArrayList<Map<String, Object>> resultMap = new ArrayList<>();
 
         JSONArray listData = (JSONArray) jsonObject.get("list");
 
         for (int i =0; i < listData.size(); i++){
             JSONObject temp = (JSONObject) listData.get(i);
-            resultMap.put(i + "번째 main", temp.get("main"));
-            resultMap.put(i + "번째 weather", temp.get("weather"));
-            resultMap.put(i + "번째 dt_txt", temp.get("dt_txt"));
+            Map<String, Object> resultdMap = new HashMap<>();
+            resultdMap.put("id", i);
+            resultdMap.put("main", temp.get("main"));
+            resultdMap.put("weather", temp.get("weather"));
+            resultdMap.put("dt_txt", temp.get("dt_txt"));
+            resultMap.add(resultdMap);
+            //resultMap.put(i + "_dt_txt", temp.get("dt_txt"));
         }
 
         /*

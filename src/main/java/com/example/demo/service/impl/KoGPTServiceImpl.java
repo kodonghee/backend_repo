@@ -1,13 +1,20 @@
 package com.example.demo.service.impl;
 
 //import com.sun.org.apache.xpath.internal.operations.String;
-import com.example.demo.service.RecommendService;
-import com.example.demo.service.WeatherService;
+import com.example.demo.dto.RequestDto;
+import com.example.demo.service.KoGPTService;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -17,29 +24,47 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class RecommendServiceImpl implements RecommendService {
+public class KoGPTServiceImpl implements KoGPTService {
 
-    //@Value("${openweathermap.key}")
-    //private String apiKey;
+    @Value("${openkakaogpt.key}")
+    private String apiKey;
     @Override
-    public String createRecommend(String prompt, Integer max_tokens){
+    public String createKoGPT(RequestDto request){
         // weather map에서 날씨 데이터 가져옴
-        String recommendData = getRecommendString(prompt, max_tokens);
+        String KoGPTData = getKoGPTString(request);
 
         // 날씨 json 파싱
-        //Map<String, Object> parseRecommend = parseRecommend(recommendData);
-        System.out.println(recommendData);
+        //Map<String, Object> parseKoGPT = parseKoGPT(KoGPTData);
+        System.out.println(KoGPTData);
 
         // 파싱 데이터 db 저장
-        return recommendData;
+        return KoGPTData;
     }
 
-    private String getRecommendString(String prompt, Integer max_tokens){
-        String apiUrl = "https://api.kakaobrain.com/v1/inference/kogpt/generation?prompt="
-                + prompt + "&max_tokens" + max_tokens;
-        try{
+    private String getKoGPTString(RequestDto request){
+        String apiUrl = "https://api.kakaobrain.com/v1/inference/kogpt/generation";
 
-            URL url = new URL(apiUrl);
+        String prompt = request.getPrompt();
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("prompt", "제주 날씨 좋은 오름 찾아줘");
+        params.add("max_tokens", 120);
+        params.add("n", 2);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", apiKey);
+
+        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(params, headers);
+
+        try{
+            RestTemplate rt = new RestTemplate();
+
+            ResponseEntity<String> response = rt.exchange(
+                    apiUrl, //{요청할 서버 주소}
+                    HttpMethod.GET, //{요청할 방식}
+                    entity, // {요청할 때 보낼 데이터}
+                    String.class //{요청시 반환되는 데이터 타입}
+            );
+            /*URL url = new URL(apiUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             int responseCode = connection.getResponseCode();
@@ -54,15 +79,17 @@ public class RecommendServiceImpl implements RecommendService {
             while ((inputLine = br.readLine()) != null){
                 response.append(inputLine);
             }
-            br.close();
+            br.close();*/
+            System.out.println(response);
 
             return response.toString();
         } catch (Exception e){
+            e.printStackTrace();
             return "failed to get response";
         }
     }
 
-    private Map<String, Object> parseRecommend(String jsonString){
+    private Map<String, Object> parseKoGPT(String jsonString){
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject;
 
