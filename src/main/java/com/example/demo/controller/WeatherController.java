@@ -16,7 +16,7 @@ public class WeatherController {
         this.weatherService = weatherService;
     }
 
-    @GetMapping("/create/weather")
+    @GetMapping("/api/test")
     ArrayList<Map<String, Object>> createWeather(@RequestParam Float latitude, @RequestParam Float longtitude){
         return weatherService.createWeather(latitude, longtitude);
     }
